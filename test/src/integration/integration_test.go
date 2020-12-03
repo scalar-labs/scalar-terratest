@@ -17,7 +17,7 @@ import (
 
 var terraformDir = flag.String("directory", "", "Directory path of the terraform module to test")
 
-func TestEndToEnd(t *testing.T) {
+func TestEndToEndTerraform(t *testing.T) {
 	t.Parallel()
 	logger.Logf(t, "Start End To End Test")
 
