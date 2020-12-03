@@ -59,7 +59,7 @@ jobs:
           curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
           cd ${GITHUB_WORKSPACE}/test/src/modules && dep ensure
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
-          go test -run TestEndToEnd -timeout 120m -args -directory="../../modules/awsdeploy/"
+          go test -run TestEndToEndTerraform -timeout 120m -args -directory="../../modules/awsdeploy/"
         working-directory: ./test
 
       - name: Slack Notification
