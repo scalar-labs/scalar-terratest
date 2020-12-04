@@ -17,6 +17,7 @@ jobs:
       TF_VERSION: 0.12.29
       DOCKERHUB_USER: scalartest
       DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+      GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
 
     steps:
       - name: Checkout
