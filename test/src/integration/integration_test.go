@@ -132,23 +132,15 @@ func runAnsiblePlaybooks(t *testing.T) {
 		cloudProvider = "azure"
 	}
 
-	gitCommand := shell.Command{
-		Command:    "git",
-		Args:       []string{"clone", "--depth", "1", "https://github.com/scalar-labs/scalar-k8s.git"},
-		WorkingDir: "./",
-	}
-
 	// Delete existing dir
 	err := os.RemoveAll("./scalar-k8s")
     if err != nil {
         t.Fatal(err)
-    }
+	}
 
 	// Git clone scalar-k8s
-	shell.RunCommand(t, gitCommand)
+	gitClone(t, "scalar-labs/scalar-k8s.git")
 
-	// Copy costom values file
-	// shell.RunCommand(t, copyCommand)
 	err = files.CopyFile("./conf/scalardl-custom-values_" + cloudProvider + ".yaml", "./conf/scalardl-custom-values.yml")
 	if err != nil {
 		t.Fatal(err)
@@ -181,4 +173,16 @@ func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
 	}
 
 	shell.RunCommand(t, ansibleCommand)
+}
+
+func gitClone(t *testing.T, repo string) {
+	token := os.Getenv("GIT_ACCESS_TOKEN")
+
+	gitCommand := shell.Command{
+		Command:    "git",
+		Args:       []string{"clone", "--depth", "1", "https://git:" + token + "@github.com/" + repo },
+		WorkingDir: "./",
+	}
+
+	shell.RunCommand(t, gitCommand)
 }
