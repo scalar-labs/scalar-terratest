@@ -128,8 +128,10 @@ func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 
 func runAnsiblePlaybooks(t *testing.T) {
 	cloudProvider := "aws"
+	installAwscli := "true"
 	if strings.Contains(*terraformDir, "azure") {
 		cloudProvider = "azure"
+		installAwscli = "false"
 	}
 
 	// Delete existing dir
@@ -157,7 +159,7 @@ func runAnsiblePlaybooks(t *testing.T) {
 	}
 
 	// Install tools
-	runAnsiblePlaybook(t, []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../"})
+	runAnsiblePlaybook(t, []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
 
 	// Deploy scalardl
 	runAnsiblePlaybook(t, []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../../conf"})
@@ -176,11 +178,13 @@ func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
 }
 
 func gitClone(t *testing.T, repo string) {
+	branch := "test"
+
 	token := os.Getenv("GIT_ACCESS_TOKEN")
 
 	gitCommand := shell.Command{
 		Command:    "git",
-		Args:       []string{"clone", "--depth", "1", "https://git:" + token + "@github.com/" + repo },
+		Args:       []string{"clone", "-b", branch, "--depth", "1", "https://git:" + token + "@github.com/" + repo },
 		WorkingDir: "./",
 	}
 
