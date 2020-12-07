@@ -36,13 +36,13 @@ jobs:
           curl -L https://github.com/scalar-labs/scalardl-java-client-sdk/archive/v${SCALARDL_JAVA_CLIENT_SDK_VERSION}.tar.gz | tar xvzf -
           mv ./scalardl-java-client-sdk-${SCALARDL_JAVA_CLIENT_SDK_VERSION} ./scalardl-java-client-sdk
         env:
-          SCALARDL_JAVA_CLIENT_SDK_VERSION: 2.0.9
+          SCALARDL_JAVA_CLIENT_SDK_VERSION: 2.1.0
         working-directory: ./test/src/integration
 
       - name: Set up GO
         uses: actions/setup-go@v1
         with:
-          go-version: 1.13.5
+          go-version: 1.13.10
         id: go
 
       - name: Create ssh key
