@@ -84,7 +84,7 @@ func TestEndToEndK8s(t *testing.T) {
 			terraform.DestroyE(t, terraformOptions)
 		}
 
-		logger.Logf(t, "Finished End To End Test")
+		logger.Logf(t, "Finished k8s End To End Test")
 	})
 
 	test_structure.RunTestStage(t, "setup", func() {
@@ -108,7 +108,7 @@ func TestEndToEndK8s(t *testing.T) {
 	test_structure.RunTestStage(t, "ansible", func() {
 		logger.Logf(t, "Run Ansible playbooks")
 		runAnsiblePlaybooks(t)
-		time.Sleep(120 * time.Second)
+		time.Sleep(300 * time.Second)
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -137,13 +137,13 @@ func runAnsiblePlaybooks(t *testing.T) {
 	// Delete existing dir
 	err := os.RemoveAll("./scalar-k8s")
     if err != nil {
-        t.Fatal(err)
+		t.Fatal(err)
 	}
 
 	// Git clone scalar-k8s
 	gitClone(t, "scalar-labs/scalar-k8s.git")
 
-	err = files.CopyFile("./conf/scalardl-custom-values_" + cloudProvider + ".yaml", "./conf/scalardl-custom-values.yml")
+	err = files.CopyFile("./conf/scalardl-custom-values_" + cloudProvider + ".yaml", "./conf/scalardl-custom-values.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,13 +178,12 @@ func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
 }
 
 func gitClone(t *testing.T, repo string) {
-	branch := "test"
-
+	// Remove the access token when the scalar-k8s repository is published
 	token := os.Getenv("GIT_ACCESS_TOKEN")
 
 	gitCommand := shell.Command{
 		Command:    "git",
-		Args:       []string{"clone", "-b", branch, "--depth", "1", "https://git:" + token + "@github.com/" + repo },
+		Args:       []string{"clone", "-b", "master", "--depth", "1", "https://git:" + token + "@github.com/" + repo },
 		WorkingDir: "./",
 	}
 

@@ -10,8 +10,8 @@ envoy:
   service:
     type: LoadBalancer
     annotations:
-      service.beta.kubernetes.io/azure-load-balancer-internal: false
-      service.beta.kubernetes.io/azure-load-balancer-internal-subnet: k8s_ingress
+      service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+      service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "k8s_ingress"
 
   tolerations:
     - effect: NoSchedule
