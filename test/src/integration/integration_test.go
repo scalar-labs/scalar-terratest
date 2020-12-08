@@ -84,7 +84,7 @@ func TestEndToEndK8s(t *testing.T) {
 			terraform.DestroyE(t, terraformOptions)
 		}
 
-		logger.Logf(t, "Finished End To End Test")
+		logger.Logf(t, "Finished k8s End To End Test")
 	})
 
 	test_structure.RunTestStage(t, "setup", func() {
@@ -143,7 +143,7 @@ func runAnsiblePlaybooks(t *testing.T) {
 	// Git clone scalar-k8s
 	gitClone(t, "scalar-labs/scalar-k8s.git")
 
-	err = files.CopyFile("./conf/scalardl-custom-values_" + cloudProvider + ".yaml", "./conf/scalardl-custom-values.yml")
+	err = files.CopyFile("./conf/scalardl-custom-values_" + cloudProvider + ".yaml", "./conf/scalardl-custom-values.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
 }
 
 func gitClone(t *testing.T, repo string) {
-	branch := "test"
+	branch := "master"
 
 	token := os.Getenv("GIT_ACCESS_TOKEN")
 
