@@ -75,6 +75,6 @@ jobs:
           SLACK_CHANNEL: eng-notification
           SLACK_COLOR: danger
           SLACK_MESSAGE: ${{ job.status }}
-          SLACK_TITLE: Integration test for Azure Kubernetes
+          SLACK_TITLE: Integration test for AWS Kubernetes
           SLACK_USERNAME: github-actions[bot]
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
