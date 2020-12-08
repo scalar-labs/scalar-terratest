@@ -3,9 +3,9 @@ name: Integration-test-with-terratest-for-AWS-Kubernetes
 on:
   # schedule:
   #   - cron: 0 15 * * *
-  # pull_request:
-  #   branches:
-  #     - add-terratest
+  pull_request:
+    branches:
+      - add-terratest
 
 jobs:
   terratest:
