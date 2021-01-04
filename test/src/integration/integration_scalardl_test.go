@@ -36,7 +36,7 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	scalarurl := ""
 
 	if os.Getenv("TEST_TYPE") != "k8s" {
-		scalarurl = lookupTargetValue(t, "scalardl", "scalar_dns")
+		scalarurl = lookupTargetValue(t, "scalardl", "envoy_dns")
 	} else {
 		scalarurl = getExternalIP(t)
 	}
@@ -65,7 +65,7 @@ func TestScalarDLWithGrpcWebClientExpectStatusCodeIsValid(t *testing.T) {
 	scalarurl := ""
 
 	if os.Getenv("TEST_TYPE") != "k8s" {
-		scalarurl = lookupTargetValue(t, "scalardl", "scalar_dns")
+		scalarurl = lookupTargetValue(t, "scalardl", "envoy_dns")
 	} else {
 		scalarurl = getExternalIP(t)
 	}

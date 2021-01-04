@@ -17,6 +17,9 @@ jobs:
       DOCKERHUB_USER: scalartest
       DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
       GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+    defaults:
+      run:
+        working-directory: ./test
 
     steps:
       - name: Checkout
@@ -47,6 +50,15 @@ jobs:
           go-version: 1.15.5
         id: go
 
+      - name: Clone scalar-terraform-examples
+        run: |
+          git clone -b main --depth 1 https://git:${GIT_ACCESS_TOKEN}@github.com/scalar-labs/scalar-terraform-examples modules
+
+      - name: Copy custom terraform.tfvars
+        run: |
+          paths=(network cassandra kubernetes)
+          for d in "${paths[@]}"; do cp config/terraform/azure/${d}/terraform.tfvars ./modules/azure/${d}/; done
+
       - name: Create ssh key
         run: |
           ssh-keygen -N "" -t rsa -f test_key <<<y
@@ -64,8 +76,7 @@ jobs:
           curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
           cd ${GITHUB_WORKSPACE}/test/src/modules && dep ensure
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
-          go test -run TestEndToEndK8s -timeout 120m -args -directory="../../modules/azuredeploy/"
-        working-directory: ./test
+          go test -run TestEndToEndK8s -timeout 120m -args -directory="../../modules/azure/"
 
       - name: Slack Notification
         if: failure()

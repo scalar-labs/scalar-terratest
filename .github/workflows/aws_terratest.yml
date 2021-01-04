@@ -12,6 +12,9 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       TF_VERSION: 0.12.29
+    defaults:
+      run:
+        working-directory: ./test
 
     steps:
       - name: Checkout
@@ -42,6 +45,15 @@ jobs:
           go-version: 1.15.5
         id: go
 
+      - name: Clone scalar-terraform-examples
+        run: |
+          git clone -b main --depth 1 https://git:${GIT_ACCESS_TOKEN}@github.com/scalar-labs/scalar-terraform-examples modules
+
+      - name: Copy custom terraform.tfvars
+        run: |
+          paths=(network cassandra scalardl monitor)
+          for d in "${paths[@]}"; do cp config/terraform/aws/${d}/terraform.tfvars ./modules/aws/${d}/; done
+
       - name: Create ssh key
         run: |
           ssh-keygen -N "" -t rsa -f test_key <<<y
@@ -59,8 +71,7 @@ jobs:
           curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
           cd ${GITHUB_WORKSPACE}/test/src/modules && dep ensure
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
-          go test -run TestEndToEndTerraform -timeout 120m -args -directory="../../modules/awsdeploy/"
-        working-directory: ./test
+          go test -run TestEndToEndTerraform -timeout 120m -args -directory="../../modules/aws/"
 
       - name: Slack Notification
         if: failure()
