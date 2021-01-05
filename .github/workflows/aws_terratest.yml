@@ -47,7 +47,7 @@ jobs:
 
       - name: Clone scalar-terraform-examples
         run: |
-          git clone -b main --depth 1 https://git:${GIT_ACCESS_TOKEN}@github.com/scalar-labs/scalar-terraform-examples modules
+          git clone -b main --depth 1 https://github.com/scalar-labs/scalar-terraform-examples modules
 
       - name: Copy custom terraform.tfvars
         run: |
