@@ -178,12 +178,9 @@ func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
 }
 
 func gitClone(t *testing.T, repo string) {
-	// Remove the access token when the scalar-k8s repository is published
-	token := os.Getenv("GIT_ACCESS_TOKEN")
-
 	gitCommand := shell.Command{
 		Command:    "git",
-		Args:       []string{"clone", "-b", "master", "--depth", "1", "https://git:" + token + "@github.com/" + repo },
+		Args:       []string{"clone", "-b", "master", "--depth", "1", "https://github.com/" + repo },
 		WorkingDir: "./",
 	}
 
