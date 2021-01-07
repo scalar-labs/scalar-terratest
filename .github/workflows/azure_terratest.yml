@@ -14,9 +14,9 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       TF_VERSION: 0.12.29
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-      DOCKER_USER: scalar-git
-      DOCKER_REGISTRY: ghcr.io
+      DOCKER_REGISTRY_PASSWORD: ${{ secrets.CR_PAT }}
+      DOCKER_REGISTRY_USERNAME: scalar-git
+      DOCKER_REGISTRY_SERVER: ghcr.io
     defaults:
       run:
         working-directory: ./test
@@ -32,7 +32,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Docker login
-        run: echo ${DOCKER_PASSWORD} | docker login -u ${env.DOCKER_USER} --password-stdin ${DOCKER_REGISTRY}
+        run: echo ${DOCKER_REGISTRY_PASSWORD} | docker login -u ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY_SERVER}
 
       - name: Download scalardl client sdk
         run: |
