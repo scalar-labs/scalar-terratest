@@ -149,13 +149,13 @@ func runAnsiblePlaybooks(t *testing.T) {
 	gitClone(t, "scalar-labs/scalar-kubernetes.git", k8sModuleDir)
 
   // Replace k8s custom values file
-	ReplaceCommand := shell.Command{
+	replaceCommand := shell.Command{
 		Command:    "sed",
 		Args:       []string{"-ie", "s/load-balancer-internal: \"true\"/load-balancer-internal: \"false\"/g", "./conf/scalardl-custom-values.yaml"},
 		WorkingDir: k8sModuleDir,
 	}
 
-	shell.RunCommand(t, ReplaceCommand)
+	shell.RunCommand(t, replaceCommand)
 
 	err = ioutil.WriteFile("./kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
 	if err != nil {
