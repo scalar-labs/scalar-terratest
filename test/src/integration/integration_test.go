@@ -11,7 +11,6 @@ import (
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/gruntwork-io/terratest/modules/terraform"
-	"github.com/gruntwork-io/terratest/modules/files"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
@@ -142,11 +141,6 @@ func runAnsiblePlaybooks(t *testing.T) {
 
 	// Git clone scalar-k8s
 	gitClone(t, "scalar-labs/scalar-k8s.git")
-
-	err = files.CopyFile("./conf/scalardl-custom-values_" + cloudProvider + ".yaml", "./conf/scalardl-custom-values.yaml")
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	err = ioutil.WriteFile("./kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
 	if err != nil {

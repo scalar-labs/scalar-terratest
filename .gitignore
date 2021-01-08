@@ -16,5 +16,4 @@ inventory.ini
 
 scalar-k8s/
 *kubeconfig
-scalardl-custom-values.yaml
 test.properties

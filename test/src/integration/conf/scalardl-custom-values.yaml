@@ -10,6 +10,8 @@ envoy:
   service:
     type: LoadBalancer
     annotations:
+      service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+      service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "k8s_ingress"
       service.beta.kubernetes.io/aws-load-balancer-internal: "false"
       service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 
@@ -56,6 +58,11 @@ ledger:
 
   scalarLedgerConfiguration:
     dbContactPoints: cassandra-lb.internal.scalar-labs.com
+    # dbContactPoints: <Cosmos DB account endpoint>
+    # dbContactPort: null
+    # dbUsername: ""
+    # dbPassword: <Cosmos DB account primary master key>
+    # dbStorage: cosmos
 
   prometheusRule:
     enabled: true
