@@ -11,6 +11,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/gruntwork-io/terratest/modules/ssh"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
@@ -113,6 +114,11 @@ func TestEndToEndK8s(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		t.Run("TestScalarDL", TestScalarDL)
 	})
+
+	test_structure.RunTestStage(t, "delete", func() {
+		logger.Logf(t, "Run helm delete")
+		runHelmDelete(t)
+	})
 }
 
 func lookupTargetValue(t *testing.T, module string, targetValue string) string {
@@ -188,4 +194,18 @@ func gitClone(t *testing.T, repo string, moduleDir string) {
 	}
 
 	shell.RunCommand(t, gitCommand)
+}
+
+func runHelmDelete(t *testing.T) {
+	bastionIP := lookupTargetValue(t, "network", "bastion_ip")
+
+	publicHost := ssh.Host{
+		Hostname:    bastionIP,
+		SshAgent:    true,
+		SshUserName: "centos",
+	}
+
+	commandHelmDelete := "helm delete prod"
+
+	ssh.CheckSshCommandE(t, publicHost, commandHelmDelete)
 }
