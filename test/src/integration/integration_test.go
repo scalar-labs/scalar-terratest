@@ -145,50 +145,45 @@ func runAnsiblePlaybooks(t *testing.T) {
   // Replace k8s custom values file
 	ReplaceCommand := shell.Command{
 		Command:    "sed",
-		Args:       []string{"-ie", "'s/load-balancer-internal: \"true\"/load-balancer-internal: \"false\"/g'", "./conf/scalardl-custom-values.yaml"},
+		Args:       []string{"-ie", "s/load-balancer-internal: \"true\"/load-balancer-internal: \"false\"/g", "./conf/scalardl-custom-values.yaml"},
 		WorkingDir: k8sModuleDir,
 	}
 
 	shell.RunCommand(t, ReplaceCommand)
 
-	// err = files.CopyFile("./conf/scalardl-custom-values.yaml", ".scalar-kubernetes/conf/scalardl-custom-values.yaml")
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-
-	err = ioutil.WriteFile(k8sModuleDir + "/conf/kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
+	err = ioutil.WriteFile("./kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = ioutil.WriteFile(k8sModuleDir + "/conf/inventory.ini", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
+	err = ioutil.WriteFile("./inventory.ini", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Install tools
-	runAnsiblePlaybook(t, []string{"./playbooks/playbook-install-tools.yml", "-e", "install_awscli=" + installAwscli})
+	runAnsiblePlaybook(t, k8sModuleDir, []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
 
 	// Deploy scalardl
-	runAnsiblePlaybook(t, []string{"./playbooks/playbook-deploy-scalardl.yml"})
+	runAnsiblePlaybook(t, k8sModuleDir, []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
 }
 
-func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
+func runAnsiblePlaybook(t *testing.T, workingDir string, playbookOptions []string) {
 	args := []string{"-i", "../inventory.ini"}
 
 	ansibleCommand := shell.Command{
 		Command:    "ansible-playbook",
 		Args:       append(args, playbookOptions...),
-		WorkingDir: "./scalar-kubernetes",
+		WorkingDir: workingDir,
 	}
 
 	shell.RunCommand(t, ansibleCommand)
 }
 
-func gitClone(t *testing.T, repo string, dir string) {
+func gitClone(t *testing.T, repo string, moduleDir string) {
 	gitCommand := shell.Command{
 		Command:    "git",
-		Args:       []string{"clone", "-b", "master", "--depth", "1", "https://github.com/" + repo, dir},
+		Args:       []string{"clone", "-b", "master", "--depth", "1", "https://github.com/" + repo, moduleDir},
 		WorkingDir: "./",
 	}
 
