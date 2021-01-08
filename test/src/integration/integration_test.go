@@ -126,37 +126,51 @@ func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 }
 
 func runAnsiblePlaybooks(t *testing.T) {
-	cloudProvider := "aws"
 	installAwscli := "true"
 	if strings.Contains(*terraformDir, "azure") {
-		cloudProvider = "azure"
 		installAwscli = "false"
 	}
 
+	k8sModuleDir := "./scalar-kubernetes"
+
 	// Delete existing dir
-	err := os.RemoveAll("./scalar-k8s")
+	err := os.RemoveAll(k8sModuleDir)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Git clone scalar-k8s
-	gitClone(t, "scalar-labs/scalar-k8s.git")
+	// Git clone scalar-kubernetes
+	gitClone(t, "scalar-labs/scalar-kubernetes.git", k8sModuleDir)
 
-	err = ioutil.WriteFile("./kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
+  // Replace k8s custom values file
+	ReplaceCommand := shell.Command{
+		Command:    "sed",
+		Args:       []string{"-ie", "'s/load-balancer-internal: \"true\"/load-balancer-internal: \"false\"/g'", "./conf/scalardl-custom-values.yaml"},
+		WorkingDir: k8sModuleDir,
+	}
+
+	shell.RunCommand(t, ReplaceCommand)
+
+	// err = files.CopyFile("./conf/scalardl-custom-values.yaml", ".scalar-kubernetes/conf/scalardl-custom-values.yaml")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	err = ioutil.WriteFile(k8sModuleDir + "/conf/kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = ioutil.WriteFile("./inventory.ini", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
+	err = ioutil.WriteFile(k8sModuleDir + "/conf/inventory.ini", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Install tools
-	runAnsiblePlaybook(t, []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
+	runAnsiblePlaybook(t, []string{"./playbooks/playbook-install-tools.yml", "-e", "install_awscli=" + installAwscli})
 
 	// Deploy scalardl
-	runAnsiblePlaybook(t, []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../../conf"})
+	runAnsiblePlaybook(t, []string{"./playbooks/playbook-deploy-scalardl.yml"})
 }
 
 func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
@@ -165,16 +179,16 @@ func runAnsiblePlaybook(t *testing.T, playbookOptions []string) {
 	ansibleCommand := shell.Command{
 		Command:    "ansible-playbook",
 		Args:       append(args, playbookOptions...),
-		WorkingDir: "./scalar-k8s",
+		WorkingDir: "./scalar-kubernetes",
 	}
 
 	shell.RunCommand(t, ansibleCommand)
 }
 
-func gitClone(t *testing.T, repo string) {
+func gitClone(t *testing.T, repo string, dir string) {
 	gitCommand := shell.Command{
 		Command:    "git",
-		Args:       []string{"clone", "-b", "master", "--depth", "1", "https://github.com/" + repo },
+		Args:       []string{"clone", "-b", "master", "--depth", "1", "https://github.com/" + repo, dir},
 		WorkingDir: "./",
 	}
 
