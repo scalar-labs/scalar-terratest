@@ -46,7 +46,10 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	logger.Logf(t, "URL: %s", scalarurl)
 	writePropertiesFile(t, scalarurl)
 
-	checkTCPConnect(t, scalarurl + ":50051")
+	err := checkTCPConnect(t, scalarurl + ":50051")
+	if err != "OK" {
+		t.Fatal(err)
+	}
 
 	code, _ := grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
 	assert.Contains(t, expectedRegisterCertStatusCode, code)
@@ -123,16 +126,22 @@ func getExternalIP(t *testing.T) string {
 func checkTCPConnect(t *testing.T, host string) string {
 	logger.Logf(t, "Check tcp connection: %s", host)
 
-	for {
-			conn,err := net.Dial("tcp", host)
+	timeout := 10 * 60
+	status := "NG"
+
+	for i := 0; i <= timeout; i += 10 {
+			conn, err := net.Dial("tcp", host)
 			if err != nil {
 				logger.Logf(t, "Connection check fail")
 			} else {
 					logger.Logf(t, "Connection check OK")
+					status = "OK"
 					defer conn.Close()
 					break
 			}
 
 			time.Sleep(10 * time.Second)
 	}
+
+	return status
 }
