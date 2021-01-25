@@ -202,7 +202,7 @@ func runHelmDelete(t *testing.T) {
 		SshUserName: "centos",
 	}
 
-	commandHelmDelete := "helm delete prod"
+	helmDeleteCommand := "helm delete prod"
 
-	ssh.CheckSshCommandE(t, publicHost, commandHelmDelete)
+	ssh.CheckSshCommandE(t, publicHost, helmDeleteCommand)
 }
