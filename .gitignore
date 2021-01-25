@@ -14,7 +14,7 @@ ssh.cfg
 kube_config
 inventory.ini
 
-scalar-k8s/
+scalar-kubernetes/
 *kubeconfig
-scalardl-custom-values.yaml
 test.properties
+test/modules
