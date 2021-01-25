@@ -3,9 +3,9 @@ package test
 import (
 	"fmt"
 	"io/ioutil"
-	"testing"
-	"os"
 	"net"
+	"os"
+	"testing"
 	"time"
 
 	"modules/grpc_helper"
@@ -46,7 +46,7 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	logger.Logf(t, "URL: %s", scalarurl)
 	writePropertiesFile(t, scalarurl)
 
-	if ! isReachable(t, scalarurl + ":50051") {
+	if !isReachable(t, scalarurl+":50051") {
 		t.Fatal("Unreachable")
 	}
 
@@ -129,7 +129,7 @@ func isReachable(t *testing.T, host string) bool {
 	checkInterval := 10
 	status := false
 
-	for i := 0; i <= numRetries; i ++ {
+	for i := 0; i <= numRetries; i++ {
 		conn, err := net.Dial("tcp", host)
 		if err != nil {
 			logger.Logf(t, "Connection check fail")
