@@ -46,8 +46,7 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	logger.Logf(t, "URL: %s", scalarurl)
 	writePropertiesFile(t, scalarurl)
 
-	err := isReachable(t, scalarurl + ":50051")
-	if err != "OK" {
+	if ! isReachable(t, scalarurl + ":50051") {
 		t.Fatal(err)
 	}
 
@@ -123,24 +122,25 @@ func getExternalIP(t *testing.T) string {
 	return output
 }
 
-func isReachable(t *testing.T, host string) string {
+func isReachable(t *testing.T, host string) bool {
 	logger.Logf(t, "Check tcp connection: %s", host)
 
-	timeout := 10 * 60
-	status := "NG"
+	numRetries := 60
+	checkInterval := 10
+	status := false
 
-	for i := 0; i <= timeout; i += 10 {
+	for i := 0; i <= numRetries; i ++ {
 		conn, err := net.Dial("tcp", host)
 		if err != nil {
 			logger.Logf(t, "Connection check fail")
 		} else {
 			logger.Logf(t, "Connection check OK")
-			status = "OK"
+			status = true
 			defer conn.Close()
 			break
 		}
 
-		time.Sleep(10 * time.Second)
+		time.Sleep(checkInterval * time.Second)
 	}
 
 	return status
