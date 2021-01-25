@@ -47,7 +47,7 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	writePropertiesFile(t, scalarurl)
 
 	if ! isReachable(t, scalarurl + ":50051") {
-		t.Fatal(err)
+		t.Fatal("Unreachable")
 	}
 
 	code, _ := grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
@@ -140,7 +140,7 @@ func isReachable(t *testing.T, host string) bool {
 			break
 		}
 
-		time.Sleep(checkInterval * time.Second)
+		time.Sleep(time.Duration(checkInterval) * time.Second)
 	}
 
 	return status
