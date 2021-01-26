@@ -127,7 +127,6 @@ func isReachable(t *testing.T, host string) bool {
 
 	numRetries := 60
 	checkInterval := 10
-	status := false
 
 	for i := 0; i <= numRetries; i++ {
 		conn, err := net.Dial("tcp", host)
@@ -135,13 +134,12 @@ func isReachable(t *testing.T, host string) bool {
 			logger.Logf(t, "Connection check fail")
 		} else {
 			logger.Logf(t, "Connection check OK")
-			status = true
 			defer conn.Close()
-			break
+			return true
 		}
 
 		time.Sleep(time.Duration(checkInterval) * time.Second)
 	}
 
-	return status
+	return false
 }
