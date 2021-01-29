@@ -110,7 +110,7 @@ func TestEndToEndK8s(t *testing.T) {
 	test_structure.RunTestStage(t, "ansible", func() {
 		logger.Logf(t, "Run Ansible playbooks")
 		runAnsiblePlaybooks(t)
-		time.Sleep(300 * time.Second)
+		time.Sleep(120 * time.Second)
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {

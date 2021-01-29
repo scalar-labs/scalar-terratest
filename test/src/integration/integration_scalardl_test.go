@@ -3,8 +3,10 @@ package test
 import (
 	"fmt"
 	"io/ioutil"
-	"testing"
+	"net"
 	"os"
+	"testing"
+	"time"
 
 	"modules/grpc_helper"
 
@@ -43,6 +45,10 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 
 	logger.Logf(t, "URL: %s", scalarurl)
 	writePropertiesFile(t, scalarurl)
+
+	if !isReachable(t, scalarurl+":50051") {
+		t.Fatal("Unreachable")
+	}
 
 	code, _ := grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
 	assert.Contains(t, expectedRegisterCertStatusCode, code)
@@ -114,4 +120,26 @@ func getExternalIP(t *testing.T) string {
 	logger.Logf(t, "URL: %s", output)
 
 	return output
+}
+
+func isReachable(t *testing.T, host string) bool {
+	logger.Logf(t, "Check tcp connection: %s", host)
+
+	numRetries := 60
+	checkInterval := 10
+
+	for i := 0; i <= numRetries; i++ {
+		conn, err := net.Dial("tcp", host)
+		if err != nil {
+			logger.Logf(t, "Connection check fail")
+		} else {
+			logger.Logf(t, "Connection check OK")
+			defer conn.Close()
+			return true
+		}
+
+		time.Sleep(time.Duration(checkInterval) * time.Second)
+	}
+
+	return false
 }
