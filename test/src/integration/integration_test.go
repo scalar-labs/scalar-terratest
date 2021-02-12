@@ -3,15 +3,15 @@ package test
 import (
 	"flag"
 	"io/ioutil"
-	"testing"
-	"time"
 	"os"
 	"strings"
+	"testing"
+	"time"
 
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/shell"
-	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/ssh"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
@@ -56,6 +56,11 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		logger.Logf(t, "Finished Creating Infrastructure: Tests will continue in 2 minutes")
 		time.Sleep(120 * time.Second)
+	})
+
+	test_structure.RunTestStage(t, "goss", func() {
+		logger.Logf(t, "Run Ansible playbooks with Goss")
+		runAnsiblePlaybooksWithGoss(t, []string("cassandra"))
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -111,6 +116,11 @@ func TestEndToEndK8s(t *testing.T) {
 		logger.Logf(t, "Run Ansible playbooks")
 		runAnsiblePlaybooks(t)
 		time.Sleep(120 * time.Second)
+	})
+
+	test_structure.RunTestStage(t, "goss", func() {
+		logger.Logf(t, "Run Ansible playbooks with Goss")
+		runAnsiblePlaybooksWithGoss(t, []string("cassandra"))
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -169,6 +179,28 @@ func runAnsiblePlaybooks(t *testing.T) {
 
 	// Deploy scalardl
 	runAnsiblePlaybook(t, k8sModuleDir, []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
+}
+
+func runAnsiblePlaybooksWithGoss(t *testing.T, scalarModules []string) {
+	cloudProvider := "aws"
+	if strings.Contains(*terraformDir, "azure") {
+		cloudProvider = "azure"
+	}
+
+	err := ioutil.WriteFile("./ssh.cfg", []byte(lookupTargetValue(t, "network", "ssh_config")), 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, m := range scalarModules {
+		err = ioutil.WriteFile("./inventories/"+m, []byte(lookupTargetValue(t, m, "inventory_ini")), 0644)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Ansible goss role
+	runAnsiblePlaybook(t, "./", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml"})
 }
 
 func runAnsiblePlaybook(t *testing.T, workingDir string, playbookOptions []string) {
