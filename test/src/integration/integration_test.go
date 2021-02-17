@@ -175,10 +175,10 @@ func runAnsiblePlaybooks(t *testing.T) {
 	}
 
 	// Install tools
-	runAnsiblePlaybook(t, k8sModuleDir, []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventory.ini", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
 
 	// Deploy scalardl
-	runAnsiblePlaybook(t, k8sModuleDir, []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventory.ini", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
 }
 
 func runAnsiblePlaybooksWithGoss(t *testing.T, scalarModules []string) {
@@ -200,11 +200,11 @@ func runAnsiblePlaybooksWithGoss(t *testing.T, scalarModules []string) {
 	}
 
 	// Ansible goss role
-	runAnsiblePlaybook(t, "./", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml"})
+	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml"})
 }
 
-func runAnsiblePlaybook(t *testing.T, workingDir string, playbookOptions []string) {
-	args := []string{"-i", "../inventory.ini"}
+func runAnsiblePlaybook(t *testing.T, workingDir string, inventory string, playbookOptions []string) {
+	args := []string{"-i", inventory}
 
 	ansibleCommand := shell.Command{
 		Command:    "ansible-playbook",
