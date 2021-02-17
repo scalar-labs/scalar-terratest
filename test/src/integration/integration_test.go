@@ -60,7 +60,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 	test_structure.RunTestStage(t, "goss", func() {
 		logger.Logf(t, "Run Ansible playbooks with Goss")
-		runAnsiblePlaybooksWithGoss(t, []string("cassandra"))
+		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"})
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -120,7 +120,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 	test_structure.RunTestStage(t, "goss", func() {
 		logger.Logf(t, "Run Ansible playbooks with Goss")
-		runAnsiblePlaybooksWithGoss(t, []string("cassandra"))
+		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"})
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
