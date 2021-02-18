@@ -118,11 +118,6 @@ func TestEndToEndK8s(t *testing.T) {
 		time.Sleep(120 * time.Second)
 	})
 
-	test_structure.RunTestStage(t, "goss", func() {
-		logger.Logf(t, "Run Ansible playbooks with Goss")
-		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"}, "cassandra")
-	})
-
 	test_structure.RunTestStage(t, "validate", func() {
 		t.Run("TestScalarDL", TestScalarDL)
 	})
