@@ -51,9 +51,12 @@ jobs:
           go-version: 1.15.5
         id: go
 
-      - name: Clone scalar-terraform-examples
-        run: |
-          git clone -b test-goss --depth 1 https://github.com/scalar-labs/scalar-terraform-examples modules
+      - name: Checkout scalar-terraform-examples
+        uses: actions/checkout@v2
+        with:
+          repository: scalar-labs/scalar-terraform-examples
+          ref: test-goss
+          path: modules
 
       - name: Copy custom terraform.tfvars
         run: |
