@@ -169,16 +169,16 @@ func runAnsiblePlaybooks(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = ioutil.WriteFile("./inventory.ini", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
+	err = ioutil.WriteFile("./inventories/kubernetes", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Install tools
-	runAnsiblePlaybook(t, k8sModuleDir, "../inventory.ini", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
 
 	// Deploy scalardl
-	runAnsiblePlaybook(t, k8sModuleDir, "../inventory.ini", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
 }
 
 func runAnsiblePlaybooksWithGoss(t *testing.T, targetModules []string, targetHosts string) {
