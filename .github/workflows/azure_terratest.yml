@@ -56,7 +56,7 @@ jobs:
         with:
           repository: scalar-labs/scalar-terraform-examples
           ref: test-goss
-          path: modules
+          path: ./test/modules
 
       - name: Copy custom terraform.tfvars
         run: |
