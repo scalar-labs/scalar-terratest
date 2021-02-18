@@ -187,6 +187,9 @@ func runAnsiblePlaybooksWithGoss(t *testing.T, scalarModules []string) {
 		cloudProvider = "azure"
 	}
 
+	// e.g., "cassandra,cassy,reaper,..."
+	checkHosts := "cassandra"
+
 	err := ioutil.WriteFile("./ssh.cfg", []byte(lookupTargetValue(t, "network", "ssh_config")), 0644)
 	if err != nil {
 		t.Fatal(err)
@@ -200,7 +203,7 @@ func runAnsiblePlaybooksWithGoss(t *testing.T, scalarModules []string) {
 	}
 
 	// Ansible goss role
-	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml"})
+	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", checkHosts})
 }
 
 func runAnsiblePlaybook(t *testing.T, workingDir string, inventory string, playbookOptions []string) {
