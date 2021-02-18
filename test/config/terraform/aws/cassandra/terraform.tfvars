@@ -1,5 +1,7 @@
 region = "us-east-1"
 
+base = "bai"
+
 cassandra = {
   start_on_initial_boot = true
 }
