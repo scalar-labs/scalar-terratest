@@ -60,7 +60,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 	test_structure.RunTestStage(t, "goss", func() {
 		logger.Logf(t, "Run Ansible playbooks with Goss")
-		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"})
+		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"}, "cassandra")
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -120,7 +120,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 	test_structure.RunTestStage(t, "goss", func() {
 		logger.Logf(t, "Run Ansible playbooks with Goss")
-		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"})
+		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"}, "cassandra")
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -181,21 +181,18 @@ func runAnsiblePlaybooks(t *testing.T) {
 	runAnsiblePlaybook(t, k8sModuleDir, "../inventory.ini", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
 }
 
-func runAnsiblePlaybooksWithGoss(t *testing.T, scalarModules []string) {
+func runAnsiblePlaybooksWithGoss(t *testing.T, targetModules []string, targetHosts string) {
 	cloudProvider := "aws"
 	if strings.Contains(*terraformDir, "azure") {
 		cloudProvider = "azure"
 	}
-
-	// e.g., "cassandra,cassy,reaper,..."
-	checkHosts := "cassandra"
 
 	err := ioutil.WriteFile("./ssh.cfg", []byte(lookupTargetValue(t, "network", "ssh_config")), 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for _, m := range scalarModules {
+	for _, m := range targetModules {
 		err = ioutil.WriteFile("./inventories/"+m, []byte(lookupTargetValue(t, m, "inventory_ini")), 0644)
 		if err != nil {
 			t.Fatal(err)
@@ -203,7 +200,7 @@ func runAnsiblePlaybooksWithGoss(t *testing.T, scalarModules []string) {
 	}
 
 	// Ansible goss role
-	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", checkHosts})
+	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", targetHosts})
 }
 
 func runAnsiblePlaybook(t *testing.T, workingDir string, inventory string, playbookOptions []string) {
