@@ -60,7 +60,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 	test_structure.RunTestStage(t, "goss", func() {
 		logger.Logf(t, "Run Ansible playbooks with Goss")
-		runAnsiblePlaybooksWithGoss(t, []string{"cassandra"}, "cassandra")
+		runGoss(t, []string{"cassandra"}, "cassandra")
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -176,7 +176,7 @@ func runAnsiblePlaybooks(t *testing.T) {
 	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
 }
 
-func runAnsiblePlaybooksWithGoss(t *testing.T, targetModules []string, targetHosts string) {
+func runGoss(t *testing.T, targetModules []string, targetHosts string) {
 	cloudProvider := "aws"
 	if strings.Contains(*terraformDir, "azure") {
 		cloudProvider = "azure"
