@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -38,15 +39,15 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	scalarurl := ""
 
 	if os.Getenv("TEST_TYPE") != "k8s" {
-		scalarurl = lookupTargetValue(t, "scalardl", "envoy_dns")
+		scalarurl = strings.Trim(lookupTargetValue(t, "scalardl", "envoy_dns"), "\"")
 	} else {
 		scalarurl = getExternalIP(t)
 	}
 
 	logger.Logf(t, "URL: %s", scalarurl)
-	writePropertiesFile(t, scalarurl)
+	writePropertiesFile(t, strings.Trim(scalarurl, "\""))
 
-	if !isReachable(t, scalarurl+":50051") {
+	if !isReachable(t, fmt.Sprintf(`%s:50051`, strings.Trim(scalarurl, "\""))) {
 		t.Fatal("Unreachable")
 	}
 
@@ -71,7 +72,7 @@ func TestScalarDLWithGrpcWebClientExpectStatusCodeIsValid(t *testing.T) {
 	scalarurl := ""
 
 	if os.Getenv("TEST_TYPE") != "k8s" {
-		scalarurl = lookupTargetValue(t, "scalardl", "envoy_dns")
+		scalarurl = strings.Trim(lookupTargetValue(t, "scalardl", "envoy_dns"), "\"")
 	} else {
 		scalarurl = getExternalIP(t)
 	}
@@ -105,7 +106,7 @@ func writePropertiesFile(t *testing.T, host string) {
 }
 
 func getExternalIP(t *testing.T) string {
-	bastionIP := lookupTargetValue(t, "network", "bastion_ip")
+	bastionIP := strings.Trim(lookupTargetValue(t, "network", "bastion_ip"), "\"")
 
 	publicHost := ssh.Host{
 		Hostname:    bastionIP,

@@ -3,15 +3,15 @@ package test
 import (
 	"flag"
 	"io/ioutil"
-	"testing"
-	"time"
 	"os"
 	"strings"
+	"testing"
+	"time"
 
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/shell"
-	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/gruntwork-io/terratest/modules/ssh"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
@@ -194,7 +194,7 @@ func gitClone(t *testing.T, repo string, moduleDir string) {
 }
 
 func runHelmDelete(t *testing.T) {
-	bastionIP := lookupTargetValue(t, "network", "bastion_ip")
+	bastionIP := strings.Trim(lookupTargetValue(t, "network", "bastion_ip"), "\"")
 
 	publicHost := ssh.Host{
 		Hostname:    bastionIP,
