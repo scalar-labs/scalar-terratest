@@ -2,12 +2,12 @@ package test
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/gruntwork-io/terratest/modules/ssh"
@@ -135,8 +135,10 @@ func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 
 func runAnsiblePlaybooks(t *testing.T) {
 	installAwscli := "true"
+	cloudProvider := "aws"
 	if strings.Contains(*terraformDir, "azure") {
 		installAwscli = "false"
+		cloudProvider = "azure"
 	}
 
 	k8sModuleDir := "./scalar-kubernetes"
@@ -159,12 +161,12 @@ func runAnsiblePlaybooks(t *testing.T) {
 
 	shell.RunCommand(t, replaceCommand)
 
-	err = ioutil.WriteFile("./kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
+	err = files.CopyFile("../../modules/"+cloudProvider+"/kubernetes/kube_config", "./kube_config")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = ioutil.WriteFile("./inventories/kubernetes", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
+	err = files.CopyFile("../../modules/"+cloudProvider+"/network/network_inventory", "./inventories/network_inventory")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,13 +184,13 @@ func runGoss(t *testing.T, targetModules []string, targetHosts string) {
 		cloudProvider = "azure"
 	}
 
-	err := ioutil.WriteFile("./ssh.cfg", []byte(lookupTargetValue(t, "network", "ssh_config")), 0644)
+	err := files.CopyFile("../../modules/"+cloudProvider+"/network/ssh.cfg", "./ssh.cfg")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, m := range targetModules {
-		err = ioutil.WriteFile("./inventories/"+m, []byte(lookupTargetValue(t, m, "inventory_ini")), 0644)
+		err = files.CopyFile("../../modules/"+cloudProvider+"/"+m+"/"+m+"_inventory", "./inventories/"+m+"_inventory")
 		if err != nil {
 			t.Fatal(err)
 		}
