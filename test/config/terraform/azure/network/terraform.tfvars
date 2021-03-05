@@ -1,5 +1,7 @@
 region = "West US"
 
+base = "bai"
+
 name = "Terratest"
 
 public_key_path = "../../test_key.pub"

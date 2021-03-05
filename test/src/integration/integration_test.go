@@ -221,7 +221,7 @@ func gitClone(t *testing.T, repo string, moduleDir string) {
 }
 
 func runHelmDelete(t *testing.T) {
-	bastionIP := lookupTargetValue(t, "network", "bastion_ip")
+	bastionIP := strings.Trim(lookupTargetValue(t, "network", "bastion_ip"), "\"")
 
 	publicHost := ssh.Host{
 		Hostname:    bastionIP,

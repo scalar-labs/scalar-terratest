@@ -1,3 +1,5 @@
+base = "bai"
+
 cassandra = {
   start_on_initial_boot = true
 }
