@@ -1,0 +1,27 @@
+name: test-create-jira-issue
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  terratest:
+    name: Terratest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Jira Login
+        uses: atlassian/gajira-login@master
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      - name: Jira Create issue
+        uses: atlassian/gajira-create@v2.0.1
+        with:
+          project: DLT
+          issuetype: Incident
+          summary: '[TEST] Terratest'
+          description: 'terratest description'
