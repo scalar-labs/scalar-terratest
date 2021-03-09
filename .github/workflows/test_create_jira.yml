@@ -22,6 +22,6 @@ jobs:
         uses: atlassian/gajira-create@v2.0.1
         with:
           project: DLT
-          issuetype: Incident
+          issuetype: Bug
           summary: '[TEST] Terratest'
           description: 'terratest description'
