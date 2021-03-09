@@ -16,6 +16,7 @@ import (
 )
 
 var terraformDir = flag.String("directory", "", "Directory path of the terraform module to test")
+var cloudProvider = flag.String("cloud", "aws", "Cloud provider")
 
 func TestEndToEndTerraform(t *testing.T) {
 	t.Parallel()
@@ -28,7 +29,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -45,7 +46,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -82,7 +83,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -99,7 +100,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -125,7 +126,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 	terraformOptions := &terraform.Options{
-		TerraformDir: *terraformDir + module,
+		TerraformDir: *terraformDir + *cloudProvider + "/" + module,
 		Vars:         map[string]interface{}{},
 		NoColor:      true,
 	}
@@ -134,13 +135,6 @@ func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 }
 
 func runAnsiblePlaybooks(t *testing.T) {
-	installAwscli := "true"
-	cloudProvider := "aws"
-	if strings.Contains(*terraformDir, "azure") {
-		installAwscli = "false"
-		cloudProvider = "azure"
-	}
-
 	k8sModuleDir := "./scalar-kubernetes"
 
 	// Delete existing dir
@@ -161,43 +155,38 @@ func runAnsiblePlaybooks(t *testing.T) {
 
 	shell.RunCommand(t, replaceCommand)
 
-	err = files.CopyFile("../../modules/"+cloudProvider+"/kubernetes/kube_config", "./kube_config")
+	err = files.CopyFile("../../modules/"+*cloudProvider+"/kubernetes/kube_config", "./kube_config")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = files.CopyFile("../../modules/"+cloudProvider+"/network/network_inventory", "./inventories/network_inventory")
+	err = files.CopyFile("../../modules/"+*cloudProvider+"/network/network_inventory", "./inventories/network_inventory")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Install tools
-	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../"})
 
 	// Deploy scalardl
 	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
 }
 
 func runGoss(t *testing.T, targetModules []string, targetHosts string) {
-	cloudProvider := "aws"
-	if strings.Contains(*terraformDir, "azure") {
-		cloudProvider = "azure"
-	}
-
-	err := files.CopyFile("../../modules/"+cloudProvider+"/network/ssh.cfg", "./ssh.cfg")
+	err := files.CopyFile("../../modules/"+*cloudProvider+"/network/ssh.cfg", "./ssh.cfg")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, m := range targetModules {
-		err = files.CopyFile("../../modules/"+cloudProvider+"/"+m+"/"+m+"_inventory", "./inventories/"+m+"_inventory")
+		err = files.CopyFile("../../modules/"+*cloudProvider+"/"+m+"/"+m+"_inventory", "./inventories/"+m+"_inventory")
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	// Ansible goss role
-	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", targetHosts})
+	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + *cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", targetHosts})
 }
 
 func runAnsiblePlaybook(t *testing.T, workingDir string, inventory string, playbookOptions []string) {
