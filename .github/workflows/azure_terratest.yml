@@ -77,7 +77,7 @@ jobs:
           curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
           cd ${GITHUB_WORKSPACE}/test/src/modules && dep ensure
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
-          go test -run TestEndToEndTerraform -timeout 120m -args -directory="../../modules/" -cloud="azure"
+          go test -run TestEndToEndTerraform -timeout 120m -args -directory="../../modules/" -cloud_provider="azure"
 
       - name: Slack Notification
         if: failure()

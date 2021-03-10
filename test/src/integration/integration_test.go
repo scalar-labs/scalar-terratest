@@ -16,7 +16,7 @@ import (
 )
 
 var terraformDir = flag.String("directory", "", "Directory path of the terraform module to test")
-var cloudProvider = flag.String("cloud", "aws", "Cloud provider")
+var cloudProvider = flag.String("cloud_provider", "aws", "Cloud provider")
 
 func TestEndToEndTerraform(t *testing.T) {
 	t.Parallel()
