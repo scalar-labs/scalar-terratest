@@ -2,12 +2,12 @@ package test
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/gruntwork-io/terratest/modules/files"
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/shell"
 	"github.com/gruntwork-io/terratest/modules/ssh"
@@ -16,6 +16,7 @@ import (
 )
 
 var terraformDir = flag.String("directory", "", "Directory path of the terraform module to test")
+var cloudProvider = flag.String("cloud_provider", "aws", "Cloud provider")
 
 func TestEndToEndTerraform(t *testing.T) {
 	t.Parallel()
@@ -28,7 +29,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -45,7 +46,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -56,6 +57,11 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		logger.Logf(t, "Finished Creating Infrastructure: Tests will continue in 2 minutes")
 		time.Sleep(120 * time.Second)
+	})
+
+	test_structure.RunTestStage(t, "goss", func() {
+		logger.Logf(t, "Run Ansible playbooks with Goss")
+		runGoss(t, []string{"cassandra"}, "cassandra")
 	})
 
 	test_structure.RunTestStage(t, "validate", func() {
@@ -77,7 +83,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -94,7 +100,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + m,
+				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -120,7 +126,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 	terraformOptions := &terraform.Options{
-		TerraformDir: *terraformDir + module,
+		TerraformDir: *terraformDir + *cloudProvider + "/" + module,
 		Vars:         map[string]interface{}{},
 		NoColor:      true,
 	}
@@ -129,11 +135,6 @@ func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 }
 
 func runAnsiblePlaybooks(t *testing.T) {
-	installAwscli := "true"
-	if strings.Contains(*terraformDir, "azure") {
-		installAwscli = "false"
-	}
-
 	k8sModuleDir := "./scalar-kubernetes"
 
 	// Delete existing dir
@@ -154,25 +155,42 @@ func runAnsiblePlaybooks(t *testing.T) {
 
 	shell.RunCommand(t, replaceCommand)
 
-	err = ioutil.WriteFile("./kube_config", []byte(lookupTargetValue(t, "kubernetes", "kube_config")), 0644)
+	err = files.CopyFile("../../modules/"+*cloudProvider+"/kubernetes/kube_config", "./kube_config")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = ioutil.WriteFile("./inventory.ini", []byte(lookupTargetValue(t, "kubernetes", "inventory_ini")), 0644)
+	err = files.CopyFile("../../modules/"+*cloudProvider+"/network/network_inventory", "./inventories/network_inventory")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Install tools
-	runAnsiblePlaybook(t, k8sModuleDir, []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../", "-e", "install_awscli=" + installAwscli})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../"})
 
 	// Deploy scalardl
-	runAnsiblePlaybook(t, k8sModuleDir, []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
 }
 
-func runAnsiblePlaybook(t *testing.T, workingDir string, playbookOptions []string) {
-	args := []string{"-i", "../inventory.ini"}
+func runGoss(t *testing.T, targetModules []string, targetHosts string) {
+	err := files.CopyFile("../../modules/"+*cloudProvider+"/network/ssh.cfg", "./ssh.cfg")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, m := range targetModules {
+		err = files.CopyFile("../../modules/"+*cloudProvider+"/"+m+"/"+m+"_inventory", "./inventories/"+m+"_inventory")
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Ansible goss role
+	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + *cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", targetHosts})
+}
+
+func runAnsiblePlaybook(t *testing.T, workingDir string, inventory string, playbookOptions []string) {
+	args := []string{"-i", inventory}
 
 	ansibleCommand := shell.Command{
 		Command:    "ansible-playbook",
