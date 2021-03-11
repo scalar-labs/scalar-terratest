@@ -1,0 +1,6 @@
+name: "create-jira-issue"
+description: "GitHub Action for Create jira issue"
+author: "Kun Tei"
+runs:
+  using: "docker"
+  image: "Dockerfile"
