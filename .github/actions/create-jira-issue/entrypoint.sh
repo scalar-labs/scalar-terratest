@@ -8,7 +8,7 @@ curl --request POST \
   --data "$(cat <<EOF
 {
   "fields": {
-    "summary": "[Terratest $(date +"%Y-%m-%d")] Failed in ${CLOUD_ENV}",
+    "summary": "[Terratest $(date +"%Y-%m-%d")] Failed in ${TEST_ENVIRONMENT}",
     "issuetype": {
       "name": "Bug"
     },
