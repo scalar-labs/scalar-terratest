@@ -11,17 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Jira Login
-        uses: atlassian/gajira-login@master
+      - name: Create jira issue
+        uses: ./.github/actions/create-jira-issue
         env:
+          CLOUD_ENV: "Azure"
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-
-      - name: Jira Create issue
-        uses: atlassian/gajira-create@v2.0.1
-        with:
-          project: DLT
-          issuetype: Bug
-          summary: '[TEST] Terratest'
-          description: 'terratest description'
+          JIRA_ISSUE_DESCRIPTION: ${{ job.status }}
+          JIRA_ASSIGNEE_ID: ${{ secrets.JIRA_USER_ID_TEI }}
