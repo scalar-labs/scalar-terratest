@@ -1,8 +1,8 @@
 #!/bin/sh -l
 
 curl --request POST \
-  --url "${JIRA_BASE_URL}/rest/api/2/issue" \
-  --user "${JIRA_USER_EMAIL}:${JIRA_API_TOKEN}" \
+  --url https://scalar-labs.atlassian.net/rest/api/2/issue \
+  --user ${JIRA_AUTH} \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json' \
   --data "$(cat <<EOF
