@@ -26,6 +26,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
+          java-package: jre
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
