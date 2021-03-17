@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/sh
 
 curl --request POST \
   --url https://scalar-labs.atlassian.net/rest/api/2/issue \
