@@ -86,6 +86,15 @@ jobs:
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
           go test -run TestEndToEndK8s -timeout 120m -args -directory="../../modules/" -cloud_provider="azure"
 
+      - name: Create jira issue
+        if: failure()
+        uses: ./.github/actions/create-jira-issue
+        env:
+          TEST_ENVIRONMENT: "Azure Kubernetes"
+          JIRA_AUTH: ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}
+          JIRA_ISSUE_DESCRIPTION: ${{ job.status }}
+          JIRA_ASSIGNEE_ID: 5f5a05bf189482007d1a7938 # mathew
+
       - name: Slack Notification
         if: failure()
         uses: rtCamp/action-slack-notify@master
