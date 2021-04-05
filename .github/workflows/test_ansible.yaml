@@ -1,0 +1,21 @@
+name: test ansible
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  ansible-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: run ansible
+        run: |
+          ansible --version
+          which ansible
+          pip --version
