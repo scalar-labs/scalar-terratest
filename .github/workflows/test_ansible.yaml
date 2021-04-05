@@ -18,7 +18,7 @@ jobs:
         run: |
           ansible --version
           which ansible
-          pip --version
-          pip list
-          pip install jmespath
-          pip list
+          pipx --version
+          pipx list
+          pipx install jmespath
+          pipx list
