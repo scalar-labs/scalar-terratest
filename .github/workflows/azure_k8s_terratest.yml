@@ -41,8 +41,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --user jmespath
+          pipx install jmespath
 
       - name: Download scalardl client sdk
         run: |
