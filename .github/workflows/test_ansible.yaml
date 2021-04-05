@@ -19,3 +19,6 @@ jobs:
           ansible --version
           which ansible
           pip --version
+          pip list
+          pip install jmespath
+          pip list
