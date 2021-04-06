@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pipx install jmespath
+          pipx inject ansible jmespath
 
       - name: Download scalardl client sdk
         run: |
