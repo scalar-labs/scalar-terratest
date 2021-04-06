@@ -35,8 +35,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Install dependencies
-        run: |
-          pipx inject ansible-base jmespath
+        run: pipx inject ansible-base jmespath
 
       - name: Download scalardl client sdk
         run: |
