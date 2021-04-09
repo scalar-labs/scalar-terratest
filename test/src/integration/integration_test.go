@@ -169,7 +169,7 @@ func runAnsiblePlaybooks(t *testing.T) {
 	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../"})
 
 	// Deploy scalardl
-	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "base_local_directory=../../../conf"})
+	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "local_helm_charts_values_directory=../../../conf"})
 }
 
 func runGoss(t *testing.T, targetModules []string, targetHosts string) {
