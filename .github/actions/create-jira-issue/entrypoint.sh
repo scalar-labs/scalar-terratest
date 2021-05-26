@@ -1,6 +1,11 @@
 #!/bin/sh
 
-sprint_id=$(curl -u ${JIRA_AUTH} -X GET -H "Content-Type: application/json" https://scalar-labs.atlassian.net/rest/agile/1.0/board/1/sprint?state=active | sed -n '/^{/,$p' | jq '.values[]' | jq '.id')
+sprint=$(curl -u ${JIRA_AUTH} -X GET -H "Content-Type: application/json" https://scalar-labs.atlassian.net/rest/agile/1.0/board/1/sprint?state=active | jq '.values[].id')
+
+if [ ! -z "$sprint" ]
+then
+sprint_id=',"customfield_10008": '${sprint}
+fi
 
 curl --request POST \
   --url https://scalar-labs.atlassian.net/rest/api/2/issue \
@@ -20,8 +25,8 @@ curl --request POST \
     "description": "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}: ${JIRA_ISSUE_DESCRIPTION}",
     "assignee": {
       "id": "${JIRA_ASSIGNEE_ID}"
-    },
-  "customfield_10008": ${sprint_id}
+    }
+    ${sprint_id}
   }
 }
 EOF
