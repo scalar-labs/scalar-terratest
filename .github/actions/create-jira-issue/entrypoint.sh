@@ -1,10 +1,9 @@
 #!/bin/sh
 
-sprint=$(curl -u ${JIRA_AUTH} -X GET -H "Content-Type: application/json" https://scalar-labs.atlassian.net/rest/agile/1.0/board/1/sprint?state=active | jq '.values[].id')
+sprint_id=$(curl -u ${JIRA_AUTH} -X GET -H "Content-Type: application/json" https://scalar-labs.atlassian.net/rest/agile/1.0/board/1/sprint?state=active | jq '.values[].id')
 
-if [ ! -z "$sprint" ]
-then
-sprint_id=',"customfield_10008": '${sprint}
+if [ -n "${sprint_id}" ]; then
+  sprint=',"customfield_10008": '${sprint_id}
 fi
 
 curl --request POST \
@@ -26,7 +25,7 @@ curl --request POST \
     "assignee": {
       "id": "${JIRA_ASSIGNEE_ID}"
     }
-    ${sprint_id}
+    ${sprint}
   }
 }
 EOF
