@@ -81,6 +81,11 @@ func TestEndToEndK8s(t *testing.T) {
 
 		scalarModules := []string{"kubernetes", "cassandra", "network"}
 
+		tOptions := &terraform.Options{
+			TerraformDir: *terraformDir + *cloudProvider + "/" + "kubernetes",
+		}
+		terraform.RunTerraformCommand(t, tOptions, "rm module.kubernetes.kubernetes_config_map.aws_auth")
+
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
