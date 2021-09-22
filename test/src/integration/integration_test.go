@@ -90,6 +90,7 @@ func TestEndToEndK8s(t *testing.T) {
 				NoColor:      true,
 			}
 			if m == "kubernetes" {
+				terraform.RunTerraformCommand(t, terraformOptions, "init")
 				terraform.RunTerraformCommand(t, terraformOptions, "state", "rm", "module.kubernetes.kubernetes_config_map.aws_auth")
 			}
 			logger.Logf(t, "Destroying <%s> Infrastructure", m)
