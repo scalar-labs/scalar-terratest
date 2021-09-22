@@ -81,11 +81,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 		scalarModules := []string{"kubernetes", "cassandra", "network"}
 
-		tOptions := &terraform.Options{
-			TerraformDir: *terraformDir + *cloudProvider + "/kubernetes",
 
-		}
-		terraform.RunTerraformCommand(t, tOptions, "state", "rm", "module.kubernetes.kubernetes_config_map.aws_auth")
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
@@ -97,7 +93,9 @@ func TestEndToEndK8s(t *testing.T) {
 			logger.Logf(t, "Destroying <%s> Infrastructure", m)
 			terraform.DestroyE(t, terraformOptions)
 		}
-
+		if m == "kubernetes" {
+			terraform.RunTerraformCommand(t, terraformOptions, "state", "rm", "module.kubernetes.kubernetes_config_map.aws_auth")
+		}
 		logger.Logf(t, "Finished k8s End To End Test")
 	})
 
