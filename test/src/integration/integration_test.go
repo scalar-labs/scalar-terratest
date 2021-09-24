@@ -81,8 +81,6 @@ func TestEndToEndK8s(t *testing.T) {
 
 		scalarModules := []string{"kubernetes", "cassandra", "network"}
 
-
-
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
