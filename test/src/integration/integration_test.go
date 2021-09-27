@@ -106,6 +106,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 			logger.Logf(t, "Creating <%s> Infrastructure", m)
 			terraform.InitAndApply(t, terraformOptions)
+		}
 
 		logger.Logf(t, "Finished Creating Infrastructure: Tests will continue in 2 minutes")
 		time.Sleep(120 * time.Second)
