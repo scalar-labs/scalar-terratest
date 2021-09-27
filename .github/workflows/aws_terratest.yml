@@ -21,6 +21,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          java-package: jre
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
@@ -29,6 +35,14 @@ jobs:
 
       - name: Docker login
         run: echo ${DOCKER_REGISTRY_PASSWORD} | docker login -u ${DOCKER_REGISTRY_USERNAME} --password-stdin ${DOCKER_REGISTRY_SERVER}
+
+      - name: Download scalardl client sdk
+        run: |
+          curl -L https://github.com/scalar-labs/scalardl-java-client-sdk/archive/v${SCALARDL_JAVA_CLIENT_SDK_VERSION}.tar.gz | tar xvzf -
+          mv ./scalardl-java-client-sdk-${SCALARDL_JAVA_CLIENT_SDK_VERSION} ./scalardl-java-client-sdk
+        env:
+          SCALARDL_JAVA_CLIENT_SDK_VERSION: 2.1.0
+        working-directory: ./test/src/integration
 
       - name: Set up GO
         uses: actions/setup-go@v1
