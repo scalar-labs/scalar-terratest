@@ -87,12 +87,8 @@ func TestEndToEndK8s(t *testing.T) {
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
-			if m == "kubernetes" {
-				terraform.Init(t, terraformOptions)
-				terraform.RunTerraformCommand(t, terraformOptions, "state", "rm", "module.kubernetes.kubernetes_config_map.aws_auth")
-			}
 			logger.Logf(t, "Destroying <%s> Infrastructure", m)
-			terraform.DestroyE(t, terraformOptions)
+			terraform.TgDestroyAll(t, terraformOptions)
 		}
 
 		logger.Logf(t, "Finished k8s End To End Test")
@@ -110,7 +106,6 @@ func TestEndToEndK8s(t *testing.T) {
 
 			logger.Logf(t, "Creating <%s> Infrastructure", m)
 			terraform.InitAndApply(t, terraformOptions)
-		}
 
 		logger.Logf(t, "Finished Creating Infrastructure: Tests will continue in 2 minutes")
 		time.Sleep(120 * time.Second)
