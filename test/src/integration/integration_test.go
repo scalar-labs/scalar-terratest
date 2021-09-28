@@ -30,6 +30,7 @@ func TestEndToEndTerraform(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
+				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
 
@@ -46,6 +47,7 @@ func TestEndToEndTerraform(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
+				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
 
