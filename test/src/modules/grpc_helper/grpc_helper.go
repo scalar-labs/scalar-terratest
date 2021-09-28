@@ -78,7 +78,7 @@ func GrpcJavaTest(t *testing.T, action string, options ...string) (string, strin
 	if err != nil {
 		// It continues the test since it checks error cases as well
 	}
-	fmt.Println(err)
+
 	response_status := &struct {
 		Code         string `json:"status_code"`
 		ErrorMessage string `json:"error_message"`
