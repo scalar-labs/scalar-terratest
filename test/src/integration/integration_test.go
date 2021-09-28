@@ -30,7 +30,6 @@ func TestEndToEndTerraform(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
-				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
 
@@ -47,7 +46,6 @@ func TestEndToEndTerraform(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
-				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
 
@@ -102,7 +100,6 @@ func TestEndToEndK8s(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
-				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
 
@@ -128,7 +125,6 @@ func TestEndToEndK8s(t *testing.T) {
 func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 	terraformOptions := &terraform.Options{
 		TerraformDir: *terraformDir + *cloudProvider + "/" + module,
-		Vars:         map[string]interface{}{},
 		NoColor:      true,
 	}
 
