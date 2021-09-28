@@ -85,7 +85,6 @@ func GrpcJavaTest(t *testing.T, action string, options ...string) (string, strin
 	}{}
 
 	if err := json.Unmarshal(byteOutput, &response_status); err != nil {
-		fmt.Println(err)
 		t.Fatal(err)
 	}
 

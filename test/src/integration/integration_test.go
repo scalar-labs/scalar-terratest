@@ -84,7 +84,6 @@ func TestEndToEndK8s(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
-				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
 			if m == "kubernetes" {
