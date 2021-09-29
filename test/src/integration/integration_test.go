@@ -84,10 +84,11 @@ func TestEndToEndK8s(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
-				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
-
+			if m == "kubernetes" {
+				terraform.RunTerraformCommand(t, terraformOptions, "state", "rm", "module.kubernetes.kubernetes_config_map.aws_auth")
+			}
 			logger.Logf(t, "Destroying <%s> Infrastructure", m)
 			terraform.DestroyE(t, terraformOptions)
 		}
@@ -101,7 +102,6 @@ func TestEndToEndK8s(t *testing.T) {
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
-				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
 
@@ -127,7 +127,6 @@ func TestEndToEndK8s(t *testing.T) {
 func lookupTargetValue(t *testing.T, module string, targetValue string) string {
 	terraformOptions := &terraform.Options{
 		TerraformDir: *terraformDir + *cloudProvider + "/" + module,
-		Vars:         map[string]interface{}{},
 		NoColor:      true,
 	}
 
