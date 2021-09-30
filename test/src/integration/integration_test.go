@@ -86,7 +86,7 @@ func TestEndToEndK8s(t *testing.T) {
 				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
 				NoColor:      true,
 			}
-			if m == "kubernetes" && cloudProvider == "aws" {
+			if m == "kubernetes" && *cloudProvider == "aws" {
 				terraform.RunTerraformCommand(t, terraformOptions, "state", "rm", "module.kubernetes.kubernetes_config_map.aws_auth")
 			}
 			logger.Logf(t, "Destroying <%s> Infrastructure", m)
