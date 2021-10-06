@@ -2,6 +2,7 @@ package test
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -167,6 +168,10 @@ func runAnsiblePlaybooks(t *testing.T) {
 	// Install tools
 	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-install-tools.yml", "-e", "base_local_directory=../../../../"})
 
+	// Workaround
+	// Because the configuration file assumes that monitoring is enabled
+	runKubectl(t, "create", "ns", "monitoring")
+
 	// Deploy scalardl
 	runAnsiblePlaybook(t, k8sModuleDir, "../inventories", []string{"./playbooks/playbook-deploy-scalardl.yml", "-e", "local_helm_charts_values_directory=../../../conf"})
 }
@@ -222,4 +227,17 @@ func runHelmDelete(t *testing.T) {
 	helmDeleteCommand := "helm delete prod"
 
 	ssh.CheckSshCommandE(t, publicHost, helmDeleteCommand)
+}
+
+func runKubectl(t *testing.T, args ...string) {
+	bastionIP := strings.Trim(lookupTargetValue(t, "network", "bastion_ip"), "\"")
+
+	publicHost := ssh.Host{
+		Hostname:    bastionIP,
+		SshAgent:    true,
+		SshUserName: "centos",
+	}
+
+	cmds := fmt.Sprintf("kubectl %s", strings.Join(args, " "))
+	ssh.CheckSshCommandE(t, publicHost, cmds)
 }
