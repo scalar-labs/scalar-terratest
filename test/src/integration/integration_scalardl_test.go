@@ -52,12 +52,14 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 		t.Fatal("Unreachable")
 	}
 
+	code, _ := grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
 	for {
-		code, _ := grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
 		if isWaiting(t, waitingStatusCode, code) {
 			break
 		}
+		code, _ = grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
 	}
+
 	assert.Contains(t, expectedRegisterCertStatusCode, code)
 
 	code, _ = grpc_helper.GrpcJavaRegisterContract(t, propertiesFile, contractID, contractBinaryName, contractClassFile)
