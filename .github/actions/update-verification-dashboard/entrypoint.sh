@@ -1,7 +1,8 @@
 #!/bin/sh
 
 update_test_status(){
-  local timestamp=$(date  +"%s000")
+  #local timestamp=$(date  +"%s000")
+  local timestamp="1630482498000"
   curl --request POST \
     --url http://verification-dashboard.japaneast.cloudapp.azure.com:8080/verification/details \
     --header "Content-Type: application/json" \
