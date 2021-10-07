@@ -1,8 +1,8 @@
 #!/bin/sh
 
 
-#timestamp=$(date  +"%s000")
-timestamp="1628142498000"
+timestamp=$(date  +"%s000")
+
 curl --request POST \
     --url http://verification-dashboard.japaneast.cloudapp.azure.com:8080/verification/details \
     --header "Content-Type: application/json" \
