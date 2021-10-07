@@ -1,16 +1,16 @@
 #!/bin/sh
 
-update_test_status(){
-  #local timestamp=$(date  +"%s000")
-  local timestamp="1630482498000"
-  curl --request POST \
+
+#local timestamp=$(date  +"%s000")
+timestamp="1627969698000"
+curl --request POST \
     --url http://verification-dashboard.japaneast.cloudapp.azure.com:8080/verification/details \
     --header "Content-Type: application/json" \
     --header "Authorization: Bearer ${AUTOMATE_TOOL_TOKEN}" \
     --data "$(cat <<EOF
    {
 	"testId": "${TEST_ID}",
-	"testStatus": "${STATUS}",
+	"testStatus": "${TEST_STATUS}",
 	"summary": "[Terratest $(date +"%Y-%m-%d")] Failed in ${TEST_ENVIRONMENT}",
 	"buildNumber": "",
 	"testDate": ${timestamp},
@@ -19,11 +19,4 @@ update_test_status(){
   }
 EOF
 )"
-}
 
-if [ "${TEST_STATUS}" == "success" ]; then
-  STATUS=true
-else
-  STATUS=false
-fi
-update_test_status

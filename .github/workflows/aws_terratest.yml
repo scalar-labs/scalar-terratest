@@ -82,19 +82,20 @@ jobs:
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
           go test -run TestEndToEndTerraform -timeout 120m -args -directory="../../modules/" -cloud_provider="aws"
 
-      - name: Verification Dashboard Update failure
+      - name: Verification dashboard update failure status
         if: ${{ failure() }}
         uses: ./.github/actions/update-verification-dashboard
         env:
           TEST_ID: ${{ env.TERRATEST_ID }}
-          STATUS: "failure"
-          SUMMARY: "AWS"
+          TEST_STATUS: "false"
+          TEST_ENVIRONMENT: "AWS"
           AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}
-      - name: Verification Dashboard Update success
+          
+      - name: Verification dashboard update success status
         if: ${{ !failure() }}
         uses: ./.github/actions/update-verification-dashboard
         env:
           TEST_ID: ${{ env.TERRATEST_ID }}
-          STATUS: "success"
-          SUMMARY: "AWS"
+          TEST_STATUS: "true"
+          TEST_ENVIRONMENT: "AWS"
           AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}
