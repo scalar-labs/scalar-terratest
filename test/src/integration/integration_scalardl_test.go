@@ -158,7 +158,7 @@ func isWaiting(t *testing.T, waitingStatusCode string, code string) bool {
 
 	if assert.Contains(t, waitingStatusCode, code) {
 		// adding more time before running test
-		time.Sleep(time.Duration(checkInterval) * time.Second)
+		time.Sleep(time.Duration(10) * time.Second)
 		return false
 	}
 
