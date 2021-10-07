@@ -151,7 +151,7 @@ func isReachable(t *testing.T, host string) bool {
 	return false
 }
 
-func isWaiting(t *testing.T, code string) bool {
+func isWaiting(t *testing.T, waitingStatusCode string, code string) bool {
 	logger.Logf(t, "waiting for scalardl being ready")
 
 	if assert.Contains(t, waitingStatusCode, code) {
