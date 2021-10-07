@@ -26,6 +26,7 @@ func TestScalarDL(t *testing.T) {
 func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	expectedRegisterCertStatusCode := []string{"OK", "CERTIFICATE_ALREADY_REGISTERED"}
 	expectedRegisterContractStatusCode := []string{"OK", "CONTRACT_ALREADY_REGISTERED"}
+	waitingStatusCode := "UNKNOWN_TRANSACTION_STATUS"
 	expectedExecuteContractStatusCode := "OK"
 	expectedValidateLedgerStatusCode := "OK"
 	expectedListContractsStatusCode := "OK"
@@ -51,7 +52,12 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 		t.Fatal("Unreachable")
 	}
 
-	code, _ := grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
+	for {
+		code, _ := grpc_helper.GrpcJavaRegisterCert(t, propertiesFile)
+		if isWaiting(t, waitingStatusCode, code) {
+			break
+		}
+	}
 	assert.Contains(t, expectedRegisterCertStatusCode, code)
 
 	code, _ = grpc_helper.GrpcJavaRegisterContract(t, propertiesFile, contractID, contractBinaryName, contractClassFile)
@@ -143,4 +149,16 @@ func isReachable(t *testing.T, host string) bool {
 	}
 
 	return false
+}
+
+func isWaiting(t *testing.T, code string) bool {
+	logger.Logf(t, "waiting for scalardl being ready")
+
+	if assert.Contains(t, waitingStatusCode, code) {
+		// adding more time before running test
+		time.Sleep(time.Duration(checkInterval) * time.Second)
+		return false
+	}
+
+	return true
 }
