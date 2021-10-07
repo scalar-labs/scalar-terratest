@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-    	  ref: verification-dashboard-integration
 
       - name: Setup Java
         uses: actions/setup-java@v1
