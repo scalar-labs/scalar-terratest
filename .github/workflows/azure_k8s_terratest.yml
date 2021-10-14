@@ -91,7 +91,7 @@ jobs:
           TEST_ENVIRONMENT: "Azure Kubernetes"
           JIRA_AUTH: ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}
           JIRA_ISSUE_DESCRIPTION: ${{ job.status }}
-          JIRA_ASSIGNEE_ID: 5dede50273b0bd0e4d82e164 # Boney
+          JIRA_ASSIGNEE_ID: 60de5d7c285656006a977c3c # Milan
 
       - name: Slack Notification
         if: failure()
