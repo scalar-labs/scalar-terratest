@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 timestamp=$(date  +"%s000")
 
 curl --request POST \
