@@ -13,6 +13,7 @@ jobs:
       DOCKER_REGISTRY_PASSWORD: ${{ secrets.CR_PAT }}
       DOCKER_REGISTRY_USERNAME: scalar-git
       DOCKER_REGISTRY_SERVER: ghcr.io
+      GO111MODULE: off
     defaults:
       run:
         working-directory: ./test
