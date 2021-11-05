@@ -81,23 +81,3 @@ jobs:
           cd ${GITHUB_WORKSPACE}/test/src/modules && dep ensure
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
           go test -run TestEndToEndTerraform -timeout 120m -args -directory="../../modules/" -cloud_provider="aws"
-
-      - name: Create jira issue
-        if: failure()
-        uses: ./.github/actions/create-jira-issue
-        env:
-          TEST_ENVIRONMENT: "AWS"
-          JIRA_AUTH: ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}
-          JIRA_ISSUE_DESCRIPTION: ${{ job.status }}
-          JIRA_ASSIGNEE_ID: 60de5d7c285656006a977c3c # Milan
-
-      - name: Slack Notification
-        if: failure()
-        uses: rtCamp/action-slack-notify@master
-        env:
-          SLACK_CHANNEL: eng-notification
-          SLACK_COLOR: danger
-          SLACK_MESSAGE: ${{ job.status }}
-          SLACK_TITLE: Integration test for AWS
-          SLACK_USERNAME: github-actions[bot]
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
