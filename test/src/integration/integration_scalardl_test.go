@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"modules/grpc_helper"
+	"./grpc_helper"
 
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/ssh"
