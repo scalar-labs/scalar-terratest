@@ -1,8 +1,6 @@
 name: Integration-test-with-terratest-for-AWS
 
-on:
-  schedule:
-    - cron: 0 15 * * *
+on: [push]
 
 jobs:
   terratest:
@@ -49,7 +47,7 @@ jobs:
       - name: Set up GO
         uses: actions/setup-go@v1
         with:
-          go-version: 1.15.5
+          go-version: 1.17
         id: go
 
       - name: Checkout scalar-terraform-examples
