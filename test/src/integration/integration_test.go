@@ -1,7 +1,6 @@
-package test
+package integration
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -16,9 +15,6 @@ import (
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
-var terraformDir = flag.String("directory", "", "Directory path of the terraform module to test")
-var cloudProvider = flag.String("cloud_provider", "aws", "Cloud provider")
-
 func TestEndToEndTerraform(t *testing.T) {
 	t.Parallel()
 	logger.Logf(t, "Start End To End Test")
@@ -30,7 +26,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
+				TerraformDir: *TerraformDir + *CloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -47,7 +43,7 @@ func TestEndToEndTerraform(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
+				TerraformDir: *TerraformDir + *CloudProvider + "/" + m,
 				Vars:         map[string]interface{}{},
 				NoColor:      true,
 			}
@@ -84,10 +80,10 @@ func TestEndToEndK8s(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
+				TerraformDir: *TerraformDir + *CloudProvider + "/" + m,
 				NoColor:      true,
 			}
-			if m == "kubernetes" && *cloudProvider == "aws" {
+			if m == "kubernetes" && *CloudProvider == "aws" {
 				terraform.RunTerraformCommand(t, terraformOptions, "state", "rm", "module.kubernetes.kubernetes_config_map.aws_auth")
 			}
 			logger.Logf(t, "Destroying <%s> Infrastructure", m)
@@ -102,7 +98,7 @@ func TestEndToEndK8s(t *testing.T) {
 
 		for _, m := range scalarModules {
 			terraformOptions := &terraform.Options{
-				TerraformDir: *terraformDir + *cloudProvider + "/" + m,
+				TerraformDir: *TerraformDir + *CloudProvider + "/" + m,
 				NoColor:      true,
 			}
 
@@ -123,15 +119,6 @@ func TestEndToEndK8s(t *testing.T) {
 	test_structure.RunTestStage(t, "validate", func() {
 		t.Run("TestScalarDL", TestScalarDL)
 	})
-}
-
-func lookupTargetValue(t *testing.T, module string, targetValue string) string {
-	terraformOptions := &terraform.Options{
-		TerraformDir: *terraformDir + *cloudProvider + "/" + module,
-		NoColor:      true,
-	}
-
-	return terraform.OutputRequired(t, terraformOptions, targetValue)
 }
 
 func runAnsiblePlaybooks(t *testing.T) {
@@ -155,12 +142,12 @@ func runAnsiblePlaybooks(t *testing.T) {
 
 	shell.RunCommand(t, replaceCommand)
 
-	err = files.CopyFile("../../modules/"+*cloudProvider+"/kubernetes/kube_config", "./kube_config")
+	err = files.CopyFile("../../modules/"+*CloudProvider+"/kubernetes/kube_config", "./kube_config")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = files.CopyFile("../../modules/"+*cloudProvider+"/network/network_inventory", "./inventories/network_inventory")
+	err = files.CopyFile("../../modules/"+*CloudProvider+"/network/network_inventory", "./inventories/network_inventory")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,20 +164,20 @@ func runAnsiblePlaybooks(t *testing.T) {
 }
 
 func runGoss(t *testing.T, targetModules []string, targetHosts string) {
-	err := files.CopyFile("../../modules/"+*cloudProvider+"/network/ssh.cfg", "./ssh.cfg")
+	err := files.CopyFile("../../modules/"+*CloudProvider+"/network/ssh.cfg", "./ssh.cfg")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, m := range targetModules {
-		err = files.CopyFile("../../modules/"+*cloudProvider+"/"+m+"/"+m+"_inventory", "./inventories/"+m+"_inventory")
+		err = files.CopyFile("../../modules/"+*CloudProvider+"/"+m+"/"+m+"_inventory", "./inventories/"+m+"_inventory")
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	// Ansible goss role
-	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + *cloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", targetHosts})
+	runAnsiblePlaybook(t, "./", "./inventories", []string{"../../modules/" + *CloudProvider + "/network/.terraform/modules/network/provision/ansible/playbooks/goss-server.yml", "-l", targetHosts})
 }
 
 func runAnsiblePlaybook(t *testing.T, workingDir string, inventory string, playbookOptions []string) {
@@ -216,7 +203,7 @@ func gitClone(t *testing.T, repo string, moduleDir string) {
 }
 
 func runHelmDelete(t *testing.T) {
-	bastionIP := strings.Trim(lookupTargetValue(t, "network", "bastion_ip"), "\"")
+	bastionIP := strings.Trim(LookupTargetValue(t, "network", "bastion_ip"), "\"")
 
 	publicHost := ssh.Host{
 		Hostname:    bastionIP,
@@ -230,7 +217,7 @@ func runHelmDelete(t *testing.T) {
 }
 
 func runKubectl(t *testing.T, args ...string) {
-	bastionIP := strings.Trim(lookupTargetValue(t, "network", "bastion_ip"), "\"")
+	bastionIP := strings.Trim(LookupTargetValue(t, "network", "bastion_ip"), "\"")
 
 	publicHost := ssh.Host{
 		Hostname:    bastionIP,
