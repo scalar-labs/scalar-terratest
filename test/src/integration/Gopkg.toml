@@ -1,0 +1,11 @@
+[[constraint]]
+  name = "github.com/gruntwork-io/terratest"
+  version = "0.25.2"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.6.1"
+
+[prune]
+  go-tests = true
+  unused-packages = true
