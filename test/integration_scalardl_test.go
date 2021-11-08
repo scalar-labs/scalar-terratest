@@ -1,20 +1,23 @@
-package test
+package integration
 
 import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"flag"
 	"os"
 	"strings"
 	"testing"
 	"time"
-
 	"./grpc_helper"
-
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/ssh"
 	"github.com/stretchr/testify/assert"
+	"github.com/gruntwork-io/terratest/modules/terraform"
 )
+
+var TerraformDir = flag.String("directory", "", "Directory path of the terraform module to test")
+var CloudProvider = flag.String("cloud_provider", "aws", "Cloud provider")
 
 func TestScalarDL(t *testing.T) {
 	t.Run("scalardl", func(t *testing.T) {
@@ -39,7 +42,7 @@ func TestScalarDLWithJavaClientExpectStatusCodeIsValid(t *testing.T) {
 	scalarurl := ""
 
 	if os.Getenv("TEST_TYPE") != "k8s" {
-		scalarurl = strings.Trim(lookupTargetValue(t, "scalardl", "envoy_dns"), "\"")
+		scalarurl = strings.Trim(LookupTargetValue(t, "scalardl", "envoy_dns"), "\"")
 	} else {
 		scalarurl = getExternalIP(t)
 	}
@@ -72,7 +75,7 @@ func TestScalarDLWithGrpcWebClientExpectStatusCodeIsValid(t *testing.T) {
 	scalarurl := ""
 
 	if os.Getenv("TEST_TYPE") != "k8s" {
-		scalarurl = strings.Trim(lookupTargetValue(t, "scalardl", "envoy_dns"), "\"")
+		scalarurl = strings.Trim(LookupTargetValue(t, "scalardl", "envoy_dns"), "\"")
 	} else {
 		scalarurl = getExternalIP(t)
 	}
@@ -106,7 +109,7 @@ func writePropertiesFile(t *testing.T, host string) {
 }
 
 func getExternalIP(t *testing.T) string {
-	bastionIP := strings.Trim(lookupTargetValue(t, "network", "bastion_ip"), "\"")
+	bastionIP := strings.Trim(LookupTargetValue(t, "network", "bastion_ip"), "\"")
 
 	publicHost := ssh.Host{
 		Hostname:    bastionIP,
@@ -143,4 +146,13 @@ func isReachable(t *testing.T, host string) bool {
 	}
 
 	return false
+}
+
+func LookupTargetValue(t *testing.T, module string, targetValue string) string {
+	terraformOptions := &terraform.Options{
+		TerraformDir: *TerraformDir + *CloudProvider + "/" + module,
+		NoColor:      true,
+	}
+
+	return terraform.OutputRequired(t, terraformOptions, targetValue)
 }
