@@ -14,6 +14,7 @@ jobs:
       TF_VERSION: 0.14.7
       DOCKER_REGISTRY_USERNAME: scalar-git
       DOCKER_REGISTRY_PASSWORD: ${{ secrets.CR_PAT }}
+      TERRATEST_ID: terratest-002
     defaults:
       run:
         working-directory: ./test
@@ -99,3 +100,21 @@ jobs:
           SLACK_TITLE: Integration test for AWS Kubernetes
           SLACK_USERNAME: github-actions[bot]
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      - name: Verification dashboard update failure status
+        if: ${{ failure() }}
+        uses: ./.github/actions/update-verification-dashboard
+        env:
+          TEST_ID: ${{ env.TERRATEST_ID }}
+          TEST_STATUS: "false"
+          TEST_ENVIRONMENT: "AWS Kubernetes"
+          AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}
+          
+      - name: Verification dashboard update success status
+        if: ${{ !failure() }}
+        uses: ./.github/actions/update-verification-dashboard
+        env:
+          TEST_ID: ${{ env.TERRATEST_ID }}
+          TEST_STATUS: "true"
+          TEST_ENVIRONMENT: "AWS Kubernetes"
+          AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}

@@ -1,0 +1,6 @@
+name: "update-verification-dashboard"
+description: "GitHub Action for Create test status verification for dashboard"
+author: "Jishnu"
+runs:
+  using: "docker"
+  image: "Dockerfile"
