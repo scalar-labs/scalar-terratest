@@ -81,40 +81,40 @@ jobs:
           cd ${GITHUB_WORKSPACE}/test/src/modules && dep ensure
           cd ${GITHUB_WORKSPACE}/test/src/integration && dep ensure
           go test -run TestEndToEndK8s -timeout 120m -args -directory="../../modules/" -cloud_provider="azure"
-      - name: Create jira issue
-        if: failure()
-        uses: ./.github/actions/create-jira-issue
-        env:
-          TEST_ENVIRONMENT: "Azure Kubernetes"
-          JIRA_AUTH: ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}
-          JIRA_ISSUE_DESCRIPTION: ${{ job.status }}
-          JIRA_ASSIGNEE_ID: 60de5d7c285656006a977c3c # Milan
+      # - name: Create jira issue
+      #   if: failure()
+      #   uses: ./.github/actions/create-jira-issue
+      #   env:
+      #     TEST_ENVIRONMENT: "Azure Kubernetes"
+      #     JIRA_AUTH: ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}
+      #     JIRA_ISSUE_DESCRIPTION: ${{ job.status }}
+      #     JIRA_ASSIGNEE_ID: 60de5d7c285656006a977c3c # Milan
 
-      - name: Slack Notification
-        if: failure()
-        uses: rtCamp/action-slack-notify@master
-        env:
-          SLACK_CHANNEL: eng-notification
-          SLACK_COLOR: danger
-          SLACK_MESSAGE: ${{ job.status }}
-          SLACK_TITLE: Integration test for Azure Kubernetes
-          SLACK_USERNAME: github-actions[bot]
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+      # - name: Slack Notification
+      #   if: failure()
+      #   uses: rtCamp/action-slack-notify@master
+      #   env:
+      #     SLACK_CHANNEL: eng-notification
+      #     SLACK_COLOR: danger
+      #     SLACK_MESSAGE: ${{ job.status }}
+      #     SLACK_TITLE: Integration test for Azure Kubernetes
+      #     SLACK_USERNAME: github-actions[bot]
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           
-      - name: Verification dashboard update failure status
-        if: ${{ failure() }}
-        uses: ./.github/actions/update-verification-dashboard
-        env:
-          TEST_ID: ${{ env.TERRATEST_ID }}
-          TEST_STATUS: "false"
-          TEST_ENVIRONMENT: "Azure Kubernetes"
-          AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}
+      # - name: Verification dashboard update failure status
+      #   if: ${{ failure() }}
+      #   uses: ./.github/actions/update-verification-dashboard
+      #   env:
+      #     TEST_ID: ${{ env.TERRATEST_ID }}
+      #     TEST_STATUS: "false"
+      #     TEST_ENVIRONMENT: "Azure Kubernetes"
+      #     AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}
           
-      - name: Verification dashboard update success status
-        if: ${{ !failure() }}
-        uses: ./.github/actions/update-verification-dashboard
-        env:
-          TEST_ID: ${{ env.TERRATEST_ID }}
-          TEST_STATUS: "true"
-          TEST_ENVIRONMENT: "Azure Kubernetes"
-          AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}
+      # - name: Verification dashboard update success status
+      #   if: ${{ !failure() }}
+      #   uses: ./.github/actions/update-verification-dashboard
+      #   env:
+      #     TEST_ID: ${{ env.TERRATEST_ID }}
+      #     TEST_STATUS: "true"
+      #     TEST_ENVIRONMENT: "Azure Kubernetes"
+      #     AUTOMATE_TOOL_TOKEN: ${{ secrets.AUTOMATE_TOOL_TOKEN }}
