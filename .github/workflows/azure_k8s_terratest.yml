@@ -66,7 +66,7 @@ jobs:
       - name: Create ssh key
         run: |
           ssh-keygen -N "" -t rsa -f test_key <<<y
-          chmod 600 test_key
+          chmod 600 test_keyversion
         working-directory: ./test/modules
 
       - name: Install terratest modules and run terratest
